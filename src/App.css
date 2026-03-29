@@ -354,8 +354,8 @@
 }
 
 .modal-body {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-gallery {
@@ -365,13 +365,17 @@
 
 .modal-img-main {
   width: 100%;
-  height: 450px;
-  object-fit: cover;
+  height: auto;
+  max-height: 65vh;
+  object-fit: contain;
+  background-color: var(--bg-main);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  display: block;
 }
 
 .modal-gallery-thumbs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   padding: 10px;
   background: var(--bg-subtle);
@@ -389,6 +393,32 @@
 .gallery-thumb:hover {
   opacity: 0.8;
   transform: scale(1.05);
+}
+
+.slider-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.dot.active, .dot:hover {
+  background: var(--primary);
+  opacity: 1;
+  transform: scale(1.2);
 }
 
 .modal-info {
@@ -443,7 +473,7 @@
 }
 
 @media (max-width: 1024px) {
-  .about-grid, .modal-body {
+  .about-grid, .modal-details-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -480,13 +510,54 @@
   font-weight: bold;
 }
 
-.modal-footer {
-  margin-top: auto;
-  padding-top: 30px;
+.modal-details-grid {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.modal-booking-card {
+  background: var(--bg-subtle);
+  padding: 30px;
+  border-radius: var(--radius-lg);
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  border-top: 1px solid var(--bg-subtle);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0,0,0,0.05);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.booking-price-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.price-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.price-duration {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.booking-duration {
+  padding: 15px 0;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 /* Floating WhatsApp Icon */

@@ -5,6 +5,50 @@ function App() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [selectedPackage]);
+
+  const handleNextImage = (e) => {
+    if(e && e.stopPropagation) e.stopPropagation();
+    if (!selectedPackage || !selectedPackage.gallery) return;
+    setActiveImageIndex((prev) => (prev + 1) % selectedPackage.gallery.length);
+  };
+
+  const handlePrevImage = (e) => {
+    if(e && e.stopPropagation) e.stopPropagation();
+    if (!selectedPackage || !selectedPackage.gallery) return;
+    setActiveImageIndex((prev) => (prev - 1 + selectedPackage.gallery.length) % selectedPackage.gallery.length);
+  };
+
+  const handleDragStart = (e) => {
+    setTouchEnd(null);
+    const clientX = e.type.includes('mouse') ? e.clientX : e.targetTouches[0].clientX;
+    setTouchStart(clientX);
+  };
+
+  const handleDragMove = (e) => {
+    if (!touchStart) return;
+    const clientX = e.type.includes('mouse') ? e.clientX : e.targetTouches[0].clientX;
+    setTouchEnd(clientX);
+  };
+
+  const handleDragEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > 50) {
+      handleNextImage(null);
+    }
+    if (distance < -50) {
+      handlePrevImage(null);
+    }
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,15 +68,16 @@ function App() {
       rating: "4.9",
       description: "Experience the royal heritage of India. From the pink city of Jaipur to the golden dunes of Jaisalmer.",
       itinerary: [
-        "Day 1-2: Jaipur - Explore the Hawa Mahal & Amber Fort.",
-        "Day 3: Jodhpur - Visit the Majestic Mehrangarh Fort.",
-        "Day 4-6: Jaisalmer - Sam Sand Dunes & Desert Camping.",
-        "Day 7-10: Udaipur - The City of Lakes & Royal Palaces."
+        "Day 1-2: Jaipur - Explore the Hawa Mahal & Amber Fort. Enjoy a traditional Rajasthani Thali dinner.",
+        "Day 3: Jodhpur - Visit the Majestic Mehrangarh Fort and stroll through the Blue City.",
+        "Day 4-6: Jaisalmer - Sam Sand Dunes & Desert Camping with a live folk dance performance.",
+        "Day 7-10: Udaipur - The City of Lakes & Royal Palaces. Experience a sunset boat ride on Lake Pichola."
       ],
       gallery: [
-        "https://images.unsplash.com/photo-1599661046289-e31897846140?q=80&w=800&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?q=80&w=800&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1616140510594-52119ed22806?q=80&w=800&auto=format&fit=crop"
+        "https://static2.tripoto.com/media/filter/tst/img/2182615/TripDocument/1668493549_img_20221115_wa0014.jpg",
+        "https://media.tacdn.com/media/attractions-splice-spp-674x446/06/74/b3/b4.jpg",
+        "https://rajasthancab.b-cdn.net/uploads/1761901582-69047c0edfb6c.webp",
+        "https://static.thehosteller.com/hostel/images/1.jpg/1-1679037242843.jpg"
       ]
     },
     {
@@ -44,15 +89,16 @@ function App() {
       rating: "4.8",
       description: "A tranquil journey through emerald backwaters, tea plantations, and pristine beaches.",
       itinerary: [
-        "Day 1: Kochi - Colonial charm and Chinese fishing nets.",
-        "Day 2-3: Munnar - Tea garden walks and mountain mist.",
-        "Day 4: Thekkady - Spice plantations and wildlife safari.",
-        "Day 5-7: Alleppey - Luxury Houseboat stay and Backwaters."
+        "Day 1: Kochi - Colonial charm and Chinese fishing nets. Evening Kathakali dance performance.",
+        "Day 2-3: Munnar - Tea garden walks, mountain mist, and a visit to the Tata Tea Museum.",
+        "Day 4: Thekkady - Spice plantations and an exciting elephant safari in Periyar National Park.",
+        "Day 5-7: Alleppey - Luxury Houseboat stay traversing the emerald Backwaters. Authentic Kerala cuisine served on board."
       ],
       gallery: [
-        "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80&w=800&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1593693411515-c20261bcad6e?q=80&w=800&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1549488344-c65011783853?q=80&w=800&auto=format&fit=crop"
+        "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0d/de/f0/eb/backwater-tourism.jpg?w=700&h=-1&s=1",
+        "http://52.66.211.243/wp-content/uploads/2025/11/munnar.jpg",
+        "https://somatheeram-c3c5.kxcdn.com/wp-content/uploads/2019/03/Somatheeram-Kerala-roundtrip-Wildlife-min.jpg",
+        "https://pix10.agoda.net/hotelImages/10603909/-1/92e748a85e14334c991f93a26706c563.jpg?ce=0&s=414x232"
       ]
     },
     {
@@ -64,15 +110,16 @@ function App() {
       rating: "5.0",
       description: "The ultimate road trip. Cold deserts, high-altitude lakes, and ancient monasteries.",
       itinerary: [
-        "Day 1-2: Leh - Acclimatization and Local Monasteries.",
-        "Day 3-5: Nubra Valley - Hunder Sand Dunes & Camel Safari.",
-        "Day 6-8: Pangong Lake - The world's highest saltwater lake.",
-        "Day 9-12: Leh - Shopping and Departure via Magnetic Hill."
+        "Day 1-2: Leh - Acclimatization, Leh Palace, and local Monasteries including Hemis and Thiksey.",
+        "Day 3-5: Nubra Valley - Cross Khardung La Pass, Hunder Sand Dunes & double-humped Camel Safari.",
+        "Day 6-8: Pangong Lake - The world's highest saltwater lake. Overnight camping under a star-lit sky.",
+        "Day 9-12: Leh - Return via Chang La Pass. Shopping for Pashmina at local markets and Departure via Magnetic Hill."
       ],
       gallery: [
-        "https://images.unsplash.com/photo-1626017387227-dc9395f1dc38?q=80&w=800&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1594968132924-d92ea4025ea4?q=80&w=800&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1623910270059-4566f108f972?q=80&w=800&auto=format&fit=crop"
+        "https://himtrek.co.in/wp-content/uploads/2025/03/PANGONG-TSO-TO-LEH-VIA-CHANG-LA-1.webp",
+        "https://api.breakbag.com/storage/images/leh-to-nubra-valley-road-trip-yzbfa2tn3v2s4g65-1770724252312.jpeg",
+        "https://cdn.kimkim.com/files/a/content_articles/featured_photos/2afe680f438ab7f31cad3426fb31d277e8f1fe16/big-0c8da4b55236092e6fa7fb32290e9a7f.jpg",
+        "https://discoverlehladakh.in/wp-content/uploads/2024/03/Chang-la-pass-in-Leh-Ladakh.jpg"
       ]
     },
     {
@@ -84,15 +131,16 @@ function App() {
       rating: "4.9",
       description: "A soul-stirring journey into the oldest living city in the world. Witness the sacred rituals on the Ghats of Mother Ganga.",
       itinerary: [
-        "Day 1: Arrival & Evening Ganga Aarti.",
-        "Day 2: Sunrise boat ride & Kashi Vishwanath Temple.",
-        "Day 3: Sarnath - The place where Buddha gave his first sermon.",
-        "Day 4-5: Old City heritage walks and spiritual workshops."
+        "Day 1: Arrival, check-in, and an enchanting Evening Ganga Aarti at Dashashwamedh Ghat.",
+        "Day 2: Sunrise boat ride observing morning rituals & visit to Kashi Vishwanath Temple.",
+        "Day 3: Sarnath - The place where Buddha gave his first sermon. Explore the Dhamek Stupa and museum.",
+        "Day 4-5: Old City heritage walks, spiritual workshops, and discovering local silk weaving traditions."
       ],
       gallery: [
-        "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?q=80&w=800&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1625807981507-6b04ed339798?q=80&w=800&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1627885025705-649d238b1bc0?q=80&w=800&auto=format&fit=crop"
+        "https://rajajijunglesafari.com/wp-content/uploads/experience-ganga-aarti-at-haridwar.jpg",
+        "https://www.kailash-yatra.org/images/kashi-ghat.jpg",
+        "http://shrikashidham.com/wp-content/uploads/2023/09/sarnath-varanasi-e1693918484606.jpg",
+        "https://www.shutterstock.com/shutterstock/photos/782841148/display_1500/stock-photo-street-the-narrow-alleys-of-old-varanasi-s-old-town-old-street-varanasi-banaras-uttar-pradesh-782841148.jpg"
       ]
     },
     {
@@ -104,14 +152,15 @@ function App() {
       rating: "4.7",
       description: "Beyond the parties, discover the architectural charm of Old Goa and the pristine quiet beaches of the South.",
       itinerary: [
-        "Day 1-2: North Goa - Famous beaches and historical forts.",
-        "Day 3: Old Goa - UNESCO Heritage Churches & Spice Plantation.",
-        "Day 4-6: South Goa - Relaxing beach stay and water sports."
+        "Day 1-2: North Goa - Famous beaches like Baga and Anjuna, historical forts like Aguada, and vibrant nightlife.",
+        "Day 3: Old Goa - UNESCO Heritage Churches (Basilica of Bom Jesus) & a guided tour of a Spice Plantation with lunch.",
+        "Day 4-6: South Goa - Relaxing high-end luxury resort stay, secluded beaches (Colva, Palolem), and water sports."
       ],
       gallery: [
         "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=800&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1596547610537-8ff8b6eece63?q=80&w=800&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1587922546307-776227941871?q=80&w=800&auto=format&fit=crop"
+        "https://upload.wikimedia.org/wikipedia/commons/9/9e/Front_Elevation_of_Basilica_of_Bom_Jesus.jpg",
+        "https://hblimg.mmtcdn.com/content/hubble/img/goa/mmt/activities/m_activities_goa_palolem_beach_l_420_640.jpg",
+        "https://storage.googleapis.com/goa-app-12a91.appspot.com/2023-08-24T19%3A51%3A41.596Z2.webp?GoogleAccessId=firebase-adminsdk-zeqcj%40goa-app-12a91.iam.gserviceaccount.com&Expires=16447017600&Signature=LXZj%2B1g%2F9t0yuYptDYgV1f2WX4pSYSvZfqReYRucvkX8yuioTuhHvbJTEuTKcsH8iXyne%2FcdSemTQTvfjt05osS9%2BlaV9sJFybd07wbWOtFyNHyhg1VfcW0ZyOVK3EPD8rHVF33Dqsnlry2F3MdszhTBkm6NJbb9TAwn%2FQh2Ms8II1N5oSq7%2BVy6%2BV%2F6x4s1wEZ%2BF4fSEbPQIVf5243c8T8NCBhkj0uBPDOK5jZMX3k4OlNPpmKxXuyURPiNqx%2Bbg5HqKTEx%2B5rn9FhZSd2p4YoSTvUBHTtrvakTM0vFe8LX87kBFAkLcKp7JcApWURtI%2FWoJAJWv4UBx0RMEoA1Fg%3D%3D"
       ]
     },
     {
@@ -123,16 +172,18 @@ function App() {
       rating: "4.9",
       description: "Dive into crystal-clear waters and relax on white sandy beaches in the breathtaking Andaman Islands.",
       itinerary: [
-        "Day 1: Port Blair - Cellular Jail & Light and Sound Show.",
-        "Day 2: Havelock - Ferry ride & sunset at Radhanagar Beach.",
-        "Day 3: Elephant Beach - Scuba diving and water sports.",
-        "Day 4: Neil Island - Glass bottom boat ride & coral viewing.",
-        "Day 5-7: Leisure, shopping, and departure from Port Blair."
+        "Day 1: Port Blair - Arrival, Cellular Jail guided tour & emotional Light and Sound Show in the evening.",
+        "Day 2: Havelock Island - Scenic ferry ride & spectacular sunset views at Radhanagar Beach.",
+        "Day 3: Elephant Beach - Scuba diving, underwater sea walk, snorkeling, and other water sports.",
+        "Day 4: Neil Island - Glass bottom boat ride, exploring Bharatpur Beach & coral viewing.",
+        "Day 5-7: Leisure day at Chidiya Tapu, local seashell market shopping, and departure from Port Blair."
       ],
       gallery: [
-        "/images/andaman.webp",
-        "/images/goa.png",
-        "/images/kerala.png"
+        "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/02/59/36/0a/ross-island.jpg?w=1400&h=1400&s=1",
+        "https://upload.wikimedia.org/wikipedia/commons/6/63/Havelock%2C_Andaman_%26_Nicobar_Islands.JPG",
+        "https://www.theindia.co.in/blog/wp-content/uploads/2025/03/Places-for-Scuba-Diving-In-India-for-Beginner.jpg",
+        "https://i0.wp.com/go2andaman.com/wp-content/uploads/2025/12/NATURAL-BRIDGE-IMG2025-3.jpg?fit=1920%2C1080&ssl=1",
+        "https://thrillingtravel.in/wp-content/uploads/2017/03/IMG_2088-1024x683.jpg"
       ]
     }
   ];
@@ -247,27 +298,60 @@ function App() {
               <button className="close-modal" onClick={() => setSelectedPackage(null)}>&times;</button>
               <div className="modal-body">
                 <div className="modal-gallery">
-                  <img src={selectedPackage.image} alt="Gallery 1" className="modal-img-main" />
-                  <div className="modal-gallery-thumbs">
-                    {selectedPackage.gallery && selectedPackage.gallery.map((img, index) => (
-                      <img key={index} src={img} alt={`Gallery ${index + 1}`} className="gallery-thumb" />
-                    ))}
+                  <div 
+                    className="modal-img-container" 
+                    style={{ position: 'relative', cursor: 'grab' }} 
+                    onTouchStart={handleDragStart} 
+                    onTouchMove={handleDragMove} 
+                    onTouchEnd={handleDragEnd}
+                    onMouseDown={handleDragStart}
+                    onMouseMove={handleDragMove}
+                    onMouseUp={handleDragEnd}
+                    onMouseLeave={handleDragEnd}
+                  >
+                    <img 
+                      src={selectedPackage.gallery && selectedPackage.gallery.length > 0 ? selectedPackage.gallery[activeImageIndex] : selectedPackage.image} 
+                      alt="Gallery Main" 
+                      className="modal-img-main"
+                      draggable="false"
+                    />
+                    {selectedPackage.gallery && selectedPackage.gallery.length > 1 && (
+                      <div className="slider-dots">
+                        {selectedPackage.gallery.map((_, index) => (
+                          <span 
+                            key={index} 
+                            className={`dot ${index === activeImageIndex ? 'active' : ''}`} 
+                            onClick={(e) => { e.stopPropagation(); setActiveImageIndex(index); }}
+                          ></span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="modal-info">
                   <h2>{selectedPackage.name}</h2>
                   <p className="modal-desc">{selectedPackage.description}</p>
-                  <div className="itinerary-list">
-                    <h3>Day-wise Itinerary</h3>
-                    <ul>
-                      {selectedPackage.itinerary.map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="modal-footer">
-                    <span className="package-price">{selectedPackage.price}</span>
-                    <button className="btn-primary" onClick={handleConnect}>Enquire Now</button>
+                  <div className="modal-details-grid">
+                    <div className="itinerary-list">
+                      <h3>Day-wise Itinerary</h3>
+                      <ul>
+                        {selectedPackage.itinerary.map((item, index) => (
+                          <li key={index}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="modal-booking-card">
+                      <div className="booking-price-section">
+                        <span className="price-label">Starting from</span>
+                        <span className="package-price">{selectedPackage.price}</span>
+                        <span className="price-duration">per person</span>
+                      </div>
+                      <div className="booking-duration">
+                        <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>{selectedPackage.duration}</span>
+                      </div>
+                      <button className="btn-primary" onClick={handleConnect} style={{ width: '100%', marginTop: '20px' }}>Enquire Now</button>
+                    </div>
                   </div>
                 </div>
               </div>
